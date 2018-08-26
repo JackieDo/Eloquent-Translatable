@@ -1,0 +1,26 @@
+{
+    "name": "jackiedo/eloquent-translatable",
+    "description": "Making Eloquent models translatable",
+    "keywords": ["laravel", "translate", "translation", "multilingual", "language", "eloquent"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jackie Do",
+            "email": "anhvudo@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.9",
+        "illuminate/console": "5.1.*|5.2.*",
+        "illuminate/database": "5.1.*|5.2.*",
+        "illuminate/support": "5.1.*|5.2.*",
+        "illuminate/validation": "5.1.*|5.2.*",
+        "illuminate/events": "5.1.*|5.2.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Jackiedo\\EloquentTranslatable\\": "src/Jackiedo/EloquentTranslatable"
+        }
+    },
+    "minimum-stability": "stable"
+}
