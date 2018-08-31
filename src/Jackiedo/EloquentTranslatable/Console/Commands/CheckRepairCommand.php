@@ -206,7 +206,7 @@ class CheckRepairCommand extends Command
         $records      = DB::table($table)->get();
         $needRepair   = [];
 
-        if (empty($records)) {
+        if ($records->isEmpty()) {
             $this->info(PHP_EOL.'Passed. Your table have not any record now.');
 
             return true;

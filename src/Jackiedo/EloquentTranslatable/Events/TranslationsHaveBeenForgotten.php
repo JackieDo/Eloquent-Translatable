@@ -1,6 +1,5 @@
 <?php namespace Jackiedo\EloquentTranslatable\Events;
 
-use App\Events\Event;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -9,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
  * @package Jackiedo\EloquentTranslatable
  * @author  Jackie Do <anhvudo@gmail.com>
  */
-class TranslationsHaveBeenForgotten extends Event
+class TranslationsHaveBeenForgotten
 {
     /**
      * Store model

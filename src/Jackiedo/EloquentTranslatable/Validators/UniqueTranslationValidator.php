@@ -120,9 +120,7 @@ class UniqueTranslationValidator
         $query = $this->queryIgnore($query, $ignoreColumn, $ignoreValue);
         $query = $this->queryExtraWhere($query, $extraWhere);
 
-        $records = $query->get();
-
-        $filtered = array_filter($records, function($item) use ($locale, $value, $column) {
+        $filtered = $query->get()->filter(function($item, $key) use ($locale, $value, $column) {
             $valueToArray = json_decode($item->{$column}, true);
 
             if (json_last_error() == JSON_ERROR_NONE && is_array($valueToArray)) {
@@ -134,7 +132,7 @@ class UniqueTranslationValidator
             return false;
         });
 
-        $isUnique = (count($filtered) === 0);
+        $isUnique = $filtered->count() === 0;
 
         return $isUnique;
     }
