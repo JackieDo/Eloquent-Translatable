@@ -1,19 +1,22 @@
-<?php namespace Jackiedo\EloquentTranslatable\Console\Commands;
+<?php
+
+namespace Jackiedo\EloquentTranslatable\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Jackiedo\EloquentTranslatable\Traits\Translatable;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 
 /**
  * The CheckRepairCommand class.
  *
  * @package Jackiedo\EloquentTranslatable
+ *
  * @author  Jackie Do <anhvudo@gmail.com>
  */
 class CheckRepairCommand extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -30,7 +33,7 @@ class CheckRepairCommand extends Command
     protected $description = 'Check the preparation for storing the translations and correcting database values if needed';
 
     /**
-     * Store the eloquent translatable class name
+     * Store the eloquent translatable class name.
      *
      * @var string
      */
@@ -47,7 +50,7 @@ class CheckRepairCommand extends Command
     }
 
     /**
-     * Alias of the handle() method
+     * Alias of the handle() method.
      *
      * @return mixed
      */
@@ -63,10 +66,12 @@ class CheckRepairCommand extends Command
      */
     public function handle()
     {
+        $this->setFormatStyles();
+
         $className = $this->argument('class_name');
 
-        if (! class_exists($className)) {
-            $this->info(PHP_EOL.'Class "' . $className . '" not found');
+        if (!class_exists($className)) {
+            $this->info(PHP_EOL . 'Class "' . $className . '" not found');
 
             return;
         }
@@ -75,91 +80,110 @@ class CheckRepairCommand extends Command
 
         $step = 0;
 
-        $this->line(PHP_EOL.'['.++$step.']. Checking for using required traits...');
-        if (! $this->isUsedTranslatableTrait()) {
+        $this->line(PHP_EOL . '[' . ++$step . ']. Checking for using required traits...');
+        if (!$this->isUsedTranslatableTrait()) {
             return;
         }
 
-        $this->line(PHP_EOL.'['.++$step.']. Checking for declaring translatables attributes...');
-        if (! $this->hasTranslatableAttributes()) {
+        $this->line(PHP_EOL . '[' . ++$step . ']. Checking for declaring translatables attributes...');
+        if (!$this->hasTranslatableAttributes()) {
             return;
         }
 
-        $this->line(PHP_EOL.'['.++$step.']. Checking the compatibility of data types...');
-        if (! $this->isCompatibledDataType()) {
+        $this->line(PHP_EOL . '[' . ++$step . ']. Checking the compatibility of columns in the database...');
+        if (!$this->isCompatibledDataType()) {
             return;
         }
 
-        $this->line(PHP_EOL.'['.++$step.']. Checking the compatibility of value...');
-        if (! $this->isCompatibledDataValue()) {
-            $this->info(PHP_EOL.'FINAL RESULT >>> OK. Now, your model is a translatable, but some values in database ​​have yet to determine the locale.');
+        $this->line(PHP_EOL . '[' . ++$step . ']. Checking the compatibility of value...');
+        if (!$this->isCompatibledDataValue()) {
+            $this->line(PHP_EOL . '<label> FINAL RESULT: </label>');
+            $this->line('<success> OK. Now, your model is a translatable, but some values in database have yet to determine the locale. </success>');
 
             return;
         }
 
-        $this->info(PHP_EOL.'FINAL RESULT >>> Congratulations!. Everything is good. Now, your model is a translatable.');
+        $this->line(PHP_EOL . '<label> FINAL RESULT: </label>');
+        $this->line('<success> Congratulations!. Everything is good. Now, your model is a translatable. </success>');
     }
 
     /**
-     * Check if eloquent model used Translatable trait
+     * Initialize some styles for the formatter.
      *
-     * @return boolean
+     * @return void
+     */
+    protected function setFormatStyles()
+    {
+        $labelStyle = new OutputFormatterStyle('black', 'white');
+        $this->output->getFormatter()->setStyle('label', $labelStyle);
+
+        $warningStyle = new OutputFormatterStyle('black', 'yellow');
+        $this->output->getFormatter()->setStyle('warning', $warningStyle);
+
+        $successStyle = new OutputFormatterStyle('black', 'green');
+        $this->output->getFormatter()->setStyle('success', $successStyle);
+    }
+
+    /**
+     * Check if eloquent model used Translatable trait.
+     *
+     * @return bool
      */
     protected function isUsedTranslatableTrait()
     {
         $usedTraits = class_uses_recursive($this->class_name);
 
         if (array_key_exists(Translatable::class, $usedTraits)) {
-            $this->info(PHP_EOL.'Good. Your model used required trait.');
+            $this->info('Good. Your model used required trait.');
 
             return true;
         }
 
-        $this->info(PHP_EOL.'Failed. Your model is not yet using required trait.');
+        $this->error(' Failed. Your model is not yet using required trait. ');
 
         return false;
     }
 
     /**
-     * Check if eloquent model has translatable attributes
+     * Check if eloquent model has translatable attributes.
      *
-     * @return boolean
+     * @return bool
      */
     protected function hasTranslatableAttributes()
     {
         $model = new $this->class_name;
 
-        if (! empty($model->getTranslatableAttributes())) {
-            $this->info(PHP_EOL.'Good. Your model has declared translatables attributes.');
+        if (!empty($model->getTranslatableAttributes())) {
+            $this->info('Good. Your model has declared translatables attributes.');
 
             return true;
         }
 
-        $this->info(PHP_EOL.'Not good. Your model has not yet declared translatables attributes.');
+        $this->error(' Not good. Your model has not yet declared translatables attributes. ');
 
         return false;
     }
 
     /**
-     * Check if translatable columns in table is compatibled data type
+     * Check if translatable columns in table is compatibled data type.
      *
-     * @return boolean
+     * @return bool
      */
     protected function isCompatibledDataType()
     {
         $model = new $this->class_name;
         $table = $model->getTable();
 
-        if (! Schema::hasTable($table)) {
-            $this->info(PHP_EOL.'Sorry! Table "' .$table. '" of your model doesn\'t exists. Processing stop here');
+        if (!Schema::hasTable($table)) {
+            $this->error(' Sorry! Table "' . $table . '" of your model doesn\'t exists. Processing stop here. ');
 
             return false;
         }
 
-        $column_info = DB::select(DB::raw('SHOW COLUMNS FROM '.$table));
+        $column_info = DB::select(DB::raw('SHOW COLUMNS FROM ' . $table));
         $isSuccess   = true;
 
-        $type_info = array_reduce($column_info, function($carry, $column) use ($model, &$isSuccess) {
+        $type_info = array_reduce($column_info, function ($carry, $column) use ($model, &$isSuccess) {
             $name = $column->Field;
             $type = preg_replace('/^(\w+).*$/', '${1}', $column->Type);
 
@@ -167,13 +191,12 @@ class CheckRepairCommand extends Command
                 $carry[$name] = [
                     'column'   => $name,
                     'type'     => $type,
-                    'shoud_be' => 'text | longtext',
                 ];
 
-                if ($type == 'text' || $type == 'longtext') {
+                if ('text' == $type || 'longtext' == $type) {
                     $carry[$name]['result'] = 'true';
                 } else {
-                    $carry[$name]['result'] = 'false';
+                    $carry[$name]['result'] = '<error> false </error>';
                     $isSuccess = $isSuccess && false;
                 }
             }
@@ -181,21 +204,24 @@ class CheckRepairCommand extends Command
             return $carry;
         }, []);
 
-        $this->table(['Column', 'Type', 'Shoud be', 'Matched'], $type_info);
+        $this->table(['Column name', 'Column type', 'Compatible ?'], $type_info);
 
         if ($isSuccess) {
-            $this->info(PHP_EOL.'Good. The attributes in your model already have compatible data types.');
+            $this->info(PHP_EOL . 'Good. The required columns in your database already have compatible data types.');
         } else {
-            $this->info(PHP_EOL.'Not good. May be some your translatable attributes have not yet compatible type for storing translations.');
+            $this->error(PHP_EOL . ' Not good. Some your database columns have not yet compatible type to store translations. ');
+
+            $this->comment(PHP_EOL . 'The compatible data type to store translations is "text" or "longtext".');
+            $this->comment('Please change the incompatible column type in your database to compatibility type.');
         }
 
         return $isSuccess;
     }
 
     /**
-     * Check if values of translatable columns in table is compatibled
+     * Check if values of translatable columns in table is compatibled.
      *
-     * @return boolean
+     * @return bool
      */
     protected function isCompatibledDataValue()
     {
@@ -207,7 +233,7 @@ class CheckRepairCommand extends Command
         $needRepair   = [];
 
         if (empty($records)) {
-            $this->info(PHP_EOL.'Passed. Your table have not any record now.');
+            $this->info('Passed. Your table have not any record now.');
 
             return true;
         }
@@ -216,18 +242,23 @@ class CheckRepairCommand extends Command
             foreach ($verifyFields as $field) {
                 $value = json_decode($record->{$field}, true);
 
-                if (json_last_error() !== JSON_ERROR_NONE && !is_array($value)) {
+                if (JSON_ERROR_NONE !== json_last_error() && !is_array($value)) {
                     $needRepair[$record->{$keyName}][$field] = json_encode([
-                        app()->getLocale() => $record->{$field}
+                        app()->getLocale() => $record->{$field},
                     ], JSON_UNESCAPED_UNICODE);
                 }
             }
         }
 
-        if (! empty($needRepair)) {
-            $this->info(PHP_EOL.'Not good. Perhaps a few values in fields ["'.implode('", "', $verifyFields).'"] ​​have yet to determine the locale.');
+        $fieldsConcat = 'the "' . implode('", "', $verifyFields) . '" ' . (count($verifyFields) >= 2 ? 'fields' : 'field');
 
-            if ($this->confirm('So! Do you want to assign these values to default locale ('.app()->getLocale().')', true)) {
+        if (!empty($needRepair)) {
+            $this->line('<warning> Not good. Perhaps a few values in ' . $fieldsConcat . ' have yet to determine the locale. </warning>');
+
+            $this->comment(PHP_EOL . 'Don\'t worry, this does not affect the performance of your Model.');
+            $this->comment('However you should solve this issue right now. That makes your model more perfect.');
+
+            if ($this->confirm('So! Do you want to assign these values to your locale (current is "' . app()->getLocale() . '")', true)) {
                 foreach ($needRepair as $id => $updates) {
                     DB::table($table)->where($keyName, $id)->update($updates);
                 }
@@ -238,7 +269,7 @@ class CheckRepairCommand extends Command
             return false;
         }
 
-        $this->info(PHP_EOL.'Good. All your values in fields ["'.implode('", "', $verifyFields).'"] may have been translated.');
+        $this->info('Good. All your values in ' . $fieldsConcat . ' may have been translated.');
 
         return true;
     }

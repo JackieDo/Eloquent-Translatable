@@ -23,6 +23,6 @@ return [
     |
     */
 
-    'fallback_value' => null
+    'fallback_value' => null,
 
 ];

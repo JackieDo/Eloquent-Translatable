@@ -1,4 +1,6 @@
-<?php namespace Jackiedo\EloquentTranslatable;
+<?php
+
+namespace Jackiedo\EloquentTranslatable;
 
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
@@ -6,14 +8,14 @@ use Jackiedo\EloquentTranslatable\Console\Commands\CheckRepairCommand;
 use Jackiedo\EloquentTranslatable\Validators\UniqueTranslationValidator;
 
 /**
- * The EloquentTranslatableServiceProvider class
+ * The EloquentTranslatableServiceProvider class.
  *
  * @package Jackiedo\EloquentTranslatable
+ *
  * @author  Jackie Do <anhvudo@gmail.com>
  */
 class EloquentTranslatableServiceProvider extends ServiceProvider
 {
-
     /**
      * Indicates if loading of the provider is deferred.
      *
@@ -31,7 +33,7 @@ class EloquentTranslatableServiceProvider extends ServiceProvider
         // Bootstrap handles
         $this->configHandle();
 
-        Validator::extend('unique_translation', UniqueTranslationValidator::class.'@validate');
+        Validator::extend('unique_translation', UniqueTranslationValidator::class . '@validate');
     }
 
     /**
@@ -61,13 +63,13 @@ class EloquentTranslatableServiceProvider extends ServiceProvider
     }
 
     /**
-     * Loading and publishing package's config
+     * Loading and publishing package's config.
      *
      * @return void
      */
     protected function configHandle()
     {
-        $packageConfigPath = __DIR__.'/../../config/config.php';
+        $packageConfigPath = __DIR__ . '/../../config/config.php';
         $appConfigPath     = config_path('eloquent-translatable.php');
 
         $this->mergeConfigFrom($packageConfigPath, 'eloquent-translatable');

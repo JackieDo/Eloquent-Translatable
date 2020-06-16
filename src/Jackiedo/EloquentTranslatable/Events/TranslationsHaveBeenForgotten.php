@@ -1,4 +1,6 @@
-<?php namespace Jackiedo\EloquentTranslatable\Events;
+<?php
+
+namespace Jackiedo\EloquentTranslatable\Events;
 
 use App\Events\Event;
 use Illuminate\Database\Eloquent\Model;
@@ -7,26 +9,27 @@ use Illuminate\Database\Eloquent\Model;
  * The TranslationsHaveBeenForgotten class.
  *
  * @package Jackiedo\EloquentTranslatable
+ *
  * @author  Jackie Do <anhvudo@gmail.com>
  */
 class TranslationsHaveBeenForgotten extends Event
 {
     /**
-     * Store model
+     * Store model.
      *
      * @var \Illuminate\Database\Eloquent\Model
      */
     public $model;
 
     /**
-     * Store attribute
+     * Store attribute.
      *
      * @var string
      */
     public $key;
 
     /**
-     * Store locale
+     * Store locale.
      *
      * @var array
      */
@@ -35,9 +38,8 @@ class TranslationsHaveBeenForgotten extends Event
     /**
      * Create a new event instance.
      *
-     * @param  Model   $model
-     * @param  string  $key
-     * @param  array   $locales
+     * @param string $key
+     * @param array  $locales
      *
      * @return void
      */

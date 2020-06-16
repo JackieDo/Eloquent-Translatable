@@ -1,17 +1,20 @@
-<?php namespace Jackiedo\EloquentTranslatable\Validators;
+<?php
+
+namespace Jackiedo\EloquentTranslatable\Validators;
 
 use Illuminate\Support\Facades\DB;
 
 /**
- * The UniqueTranslationValidator class
+ * The UniqueTranslationValidator class.
  *
  * @package Jackiedo\EloquentTranslatable
+ *
  * @author  Jackie Do <anhvudo@gmail.com>
  */
 class UniqueTranslationValidator
 {
     /**
-     * Store rule name
+     * Store rule name.
      *
      * @var string
      */
@@ -20,12 +23,12 @@ class UniqueTranslationValidator
     /**
      * Check if the translated value is unique in the database.
      *
-     * @param  string  $attribute
-     * @param  string  $value
-     * @param  array  $parameters
-     * @param  \Illuminate\Validation\Validator  $validator
+     * @param string                           $attribute
+     * @param string                           $value
+     * @param array                            $parameters
+     * @param \Illuminate\Validation\Validator $validator
      *
-     * @return boolean
+     * @return bool
      */
     public function validate($attribute, $value, $parameters, $validator)
     {
@@ -40,7 +43,7 @@ class UniqueTranslationValidator
 
         $isUnique = $this->isUnique($value, $locale, $table, $column, $ignoreValue, $ignoreColumn, $extraWhere);
 
-        if (! $isUnique) {
+        if (!$isUnique) {
             $this->addErrorsToValidator($validator, $parameters, $name, $locale);
         }
 
@@ -49,8 +52,6 @@ class UniqueTranslationValidator
 
     /**
      * Get the extra conditions for a unique rule.
-     *
-     * @param  array  $parameters
      *
      * @return array
      */
@@ -65,8 +66,6 @@ class UniqueTranslationValidator
 
     /**
      * Get the extra conditions for a unique / exists rule.
-     *
-     * @param  array  $segments
      *
      * @return array
      */
@@ -86,7 +85,7 @@ class UniqueTranslationValidator
     /**
      * Filter NULL values.
      *
-     * @param  string|null  $value
+     * @param string|null $value
      *
      * @return string|null
      */
@@ -102,17 +101,16 @@ class UniqueTranslationValidator
     }
 
     /**
-     * Check if a translation is unique
+     * Check if a translation is unique.
      *
-     * @param  mixed  $value
-     * @param  string  $locale
-     * @param  string  $table
-     * @param  string  $column
-     * @param  mixed  $ignoreValue
-     * @param  string/null  $ignoreColumn
-     * @param  array  $extraWhere
+     * @param mixed       $value
+     * @param string      $locale
+     * @param string      $table
+     * @param string      $column
+     * @param mixed       $ignoreValue
+     * @param string/null $ignoreColumn
      *
-     * @return boolean
+     * @return bool
      */
     protected function isUnique($value, $locale, $table, $column, $ignoreValue = null, $ignoreColumn = null, array $extraWhere = [])
     {
@@ -122,10 +120,10 @@ class UniqueTranslationValidator
 
         $records = $query->get();
 
-        $filtered = array_filter($records, function($item) use ($locale, $value, $column) {
+        $filtered = array_filter($records, function ($item) use ($locale, $value, $column) {
             $valueToArray = json_decode($item->{$column}, true);
 
-            if (json_last_error() == JSON_ERROR_NONE && is_array($valueToArray)) {
+            if (JSON_ERROR_NONE == json_last_error() && is_array($valueToArray)) {
                 if (array_key_exists($locale, $valueToArray) && $valueToArray[$locale] == $value) {
                     return true;
                 }
@@ -134,7 +132,7 @@ class UniqueTranslationValidator
             return false;
         });
 
-        $isUnique = (count($filtered) === 0);
+        $isUnique = (0 === count($filtered));
 
         return $isUnique;
     }
@@ -142,19 +140,19 @@ class UniqueTranslationValidator
     /**
      * Build query for ignore the column with the given value.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  string|null  $column
-     * @param  mixed  $value
+     * @param \Illuminate\Database\Query\Builder $query
+     * @param string|null                        $column
+     * @param mixed                              $value
      *
      * @return \Illuminate\Database\Query\Builder
      */
     protected function queryIgnore($query, $column = null, $value = null)
     {
-        if ($value !== null && $column === null) {
+        if (null !== $value && null === $column) {
             $column = 'id';
         }
 
-        if ($column !== null) {
+        if (null !== $column) {
             $query = $query->where($column, '!=', $value);
         }
 
@@ -162,10 +160,9 @@ class UniqueTranslationValidator
     }
 
     /**
-     * Build query for extra where clauses
+     * Build query for extra where clauses.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $conditions
+     * @param \Illuminate\Database\Query\Builder $query
      *
      * @return \Illuminate\Database\Query\Builder
      */
@@ -181,10 +178,10 @@ class UniqueTranslationValidator
     /**
      * Add error messages to the validator.
      *
-     * @param  \Illuminate\Validation\Validator  $validator
-     * @param  array  $parameters
-     * @param  string  $name
-     * @param  string  $locale
+     * @param \Illuminate\Validation\Validator $validator
+     * @param array                            $parameters
+     * @param string                           $name
+     * @param string                           $locale
      *
      * @return void
      */

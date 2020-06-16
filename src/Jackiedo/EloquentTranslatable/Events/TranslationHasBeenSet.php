@@ -1,4 +1,6 @@
-<?php namespace Jackiedo\EloquentTranslatable\Events;
+<?php
+
+namespace Jackiedo\EloquentTranslatable\Events;
 
 use App\Events\Event;
 use Illuminate\Database\Eloquent\Model;
@@ -7,40 +9,41 @@ use Illuminate\Database\Eloquent\Model;
  * The TranslationHasBeenSet class.
  *
  * @package Jackiedo\EloquentTranslatable
+ *
  * @author  Jackie Do <anhvudo@gmail.com>
  */
 class TranslationHasBeenSet extends Event
 {
     /**
-     * Store model
+     * Store model.
      *
      * @var \Illuminate\Database\Eloquent\Model
      */
     public $model;
 
     /**
-     * Store attribute
+     * Store attribute.
      *
      * @var string
      */
     public $key;
 
     /**
-     * Store locale
+     * Store locale.
      *
      * @var string
      */
     public $locale;
 
     /**
-     * Store old value
+     * Store old value.
      *
      * @var mixed
      */
     public $oldValue;
 
     /**
-     * Store new value
+     * Store new value.
      *
      * @var mixed
      */
@@ -49,11 +52,10 @@ class TranslationHasBeenSet extends Event
     /**
      * Create a new event instance.
      *
-     * @param  Model   $model
-     * @param  string  $key
-     * @param  string  $locale
-     * @param  mixed   $oldValue
-     * @param  mixed   $newValue
+     * @param string $key
+     * @param string $locale
+     * @param mixed  $oldValue
+     * @param mixed  $newValue
      *
      * @return void
      */
