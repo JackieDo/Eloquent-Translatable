@@ -1,4 +1,6 @@
-<?php namespace Jackiedo\EloquentTranslatable\Exceptions;
+<?php
+
+namespace Jackiedo\EloquentTranslatable\Exceptions;
 
 use Exception;
 use Illuminate\Database\Eloquent\Model;
@@ -7,15 +9,15 @@ use Illuminate\Database\Eloquent\Model;
  * The AttributeIsNotTranslatable class.
  *
  * @package Jackiedo\EloquentTranslatable
+ *
  * @author  Jackie Do <anhvudo@gmail.com>
  */
 class AttributeIsNotTranslatable extends Exception
 {
     /**
-     * Make an exception
+     * Make an exception.
      *
-     * @param  string  $key
-     * @param  Model   $model
+     * @param string $key
      *
      * @return Exception
      */

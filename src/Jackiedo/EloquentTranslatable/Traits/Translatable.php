@@ -1,8 +1,10 @@
-<?php namespace Jackiedo\EloquentTranslatable\Traits;
+<?php
+
+namespace Jackiedo\EloquentTranslatable\Traits;
 
 use Illuminate\Support\Str;
-use Jackiedo\EloquentTranslatable\Events\TranslationHasBeenSet;
 use Jackiedo\EloquentTranslatable\Events\TranslationHasBeenForgotten;
+use Jackiedo\EloquentTranslatable\Events\TranslationHasBeenSet;
 use Jackiedo\EloquentTranslatable\Events\TranslationsHaveBeenForgotten;
 use Jackiedo\EloquentTranslatable\Exceptions\AttributeIsNotTranslatable;
 
@@ -10,6 +12,7 @@ use Jackiedo\EloquentTranslatable\Exceptions\AttributeIsNotTranslatable;
  * The Translatable trait.
  *
  * @package Jackiedo\EloquentTranslatable
+ *
  * @author  Jackie Do <anhvudo@gmail.com>
  */
 trait Translatable
@@ -19,7 +22,7 @@ trait Translatable
     /**
      * Hijack parent's getAttributeValue to get the translation of the given attribute instead of its value.
      *
-     * @param  string  $key
+     * @param string $key
      *
      * @return mixed
      */
@@ -35,8 +38,8 @@ trait Translatable
     /**
      * Set a given attribute on the model.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
      *
      * @return $this
      */
@@ -63,12 +66,12 @@ trait Translatable
     }
 
     /**
-     * Alias of getTranslation method
+     * Alias of getTranslation method.
      *
-     * @param  string       $key
-     * @param  string|null  $locale
-     * @param  $mixed       $useFallbackValue
-     * @param  boolean      $useRawValue
+     * @param string      $key
+     * @param string|null $locale
+     * @param mixed       $useFallbackValue
+     * @param bool        $useRawValue
      *
      * @return mixed
      */
@@ -78,12 +81,12 @@ trait Translatable
     }
 
     /**
-     * Get translation for a given attribute
+     * Get translation for a given attribute.
      *
-     * @param  string       $key
-     * @param  string|null  $locale
-     * @param  mixed        $useFallbackValue
-     * @param  boolean      $useRawValue
+     * @param string      $key
+     * @param string|null $locale
+     * @param mixed       $useFallbackValue
+     * @param bool        $useRawValue
      *
      * @return mixed
      */
@@ -97,7 +100,7 @@ trait Translatable
         }
 
         switch (true) {
-            case (is_bool($useFallbackValue) && $useFallbackValue):
+            case is_bool($useFallbackValue) && $useFallbackValue:
                 $value = $this->getFallbackTranslation($key, $locale, $translations);
                 break;
 
@@ -118,17 +121,17 @@ trait Translatable
     }
 
     /**
-     * Get all translations for given attribute or for all translatable attributes
+     * Get all translations for given attribute or for all translatable attributes.
      *
-     * @param  string|null   $key
-     * @param  bool|boolean  $useRawValue
+     * @param string|null $key
+     * @param bool        $useRawValue
      *
      * @return array
      */
     public function getTranslations($key = null, $useRawValue = false)
     {
         // Get all translations for given key in model
-        if ($key !== null) {
+        if (null !== $key) {
             $this->guardAgainstUntranslatableAttribute($key);
 
             $rawTranslations = json_decode((isset($this->attributes[$key]) ? $this->attributes[$key] : '') ?: '{}', true) ?: [];
@@ -181,11 +184,11 @@ trait Translatable
     }
 
     /**
-     * Set translation for a given translatable attribute by a locale
+     * Set translation for a given translatable attribute by a locale.
      *
-     * @param  string  $key
-     * @param  string  $locale
-     * @param  mixed   $value
+     * @param string $key
+     * @param string $locale
+     * @param mixed  $value
      *
      * @return $this
      */
@@ -194,23 +197,17 @@ trait Translatable
         $this->guardAgainstUntranslatableAttribute($key);
 
         $translations = $this->getTranslations($key, true);
-
-        $oldValue = isset($translations[$locale]) ? $translations[$locale] : '';
+        $oldValue     = isset($translations[$locale]) ? $translations[$locale] : '';
 
         if ($this->hasSetTranslationModifier($key)) {
             $value = $this->mutateSetTranslation($key, $value, $locale);
-        }
-
-        elseif ($value && (in_array($key . $this->translableSuffix, $this->getDates()) || $this->isDateCastable($key . $this->translableSuffix))) {
+        } elseif ($value && (in_array($key . $this->translableSuffix, $this->getDates()) || $this->isDateCastable($key . $this->translableSuffix))) {
             $value = $this->fromDateTime($value);
-        }
-
-        elseif ($this->isJsonCastable($key . $this->translableSuffix) && ! is_null($value)) {
+        } elseif ($this->isJsonCastable($key . $this->translableSuffix) && !is_null($value)) {
             $value = $this->castAttributeAsJson($key . $this->translableSuffix, $value);
         }
 
-        $translations[$locale] = $value;
-
+        $translations[$locale]  = $value;
         $this->attributes[$key] = $this->asJson($translations);
 
         event(new TranslationHasBeenSet($this, $key, $locale, $oldValue, $value));
@@ -219,10 +216,9 @@ trait Translatable
     }
 
     /**
-     * Set multiple translations for a given translatable attribute
+     * Set multiple translations for a given translatable attribute.
      *
-     * @param  string  $key
-     * @param  array   $translations
+     * @param string $key
      *
      * @return $this
      */
@@ -238,10 +234,10 @@ trait Translatable
     }
 
     /**
-     * Remove a given translation for attribute
+     * Remove a given translation for attribute.
      *
-     * @param  string  $key
-     * @param  string  $locale
+     * @param string $key
+     * @param string $locale
      *
      * @return $this
      */
@@ -259,10 +255,9 @@ trait Translatable
     }
 
     /**
-     * Remove some translations for attribute
+     * Remove some translations for attribute.
      *
-     * @param  string  $key
-     * @param  array   $locales
+     * @param string $key
      *
      * @return $this
      */
@@ -312,7 +307,7 @@ trait Translatable
     {
         $result = @json_decode($this->getOriginal($key));
 
-        return json_last_error() == JSON_ERROR_NONE && is_array($result);
+        return JSON_ERROR_NONE == json_last_error() && is_array($result);
     }
 
     public function getTranslatedLocales($key)
@@ -327,41 +322,7 @@ trait Translatable
 
     public function getTranslatableAttributes()
     {
-        return is_array($this->translatable)
-            ? $this->translatable
-            : [];
-    }
-
-    protected function guardAgainstUntranslatableAttribute($key)
-    {
-        if (!$this->isTranslatableAttribute($key)) {
-            throw AttributeIsNotTranslatable::make($key, $this);
-        }
-    }
-
-    protected function getLocale()
-    {
-        return config('app.locale');
-    }
-
-    protected function getFallbackTranslation($key, $locale, array $translations)
-    {
-        if (method_exists($this, $fallbackMethod = 'get'.Str::studly($key).'FallbackTranslation')) {
-            return $this->{$fallbackMethod}($locale, $translations);
-        }
-
-        if (!is_null($fallbackLocale = config('eloquent-translatable.fallback_locale'))) {
-            if (array_key_exists($fallbackLocale, $translations)) {
-                return $translations[$fallbackLocale];
-            }
-        }
-
-        return config('eloquent-translatable.fallback_value', null);
-    }
-
-    protected function jsonResponsesUntranslatable()
-    {
-        return [];
+        return is_array($this->translatable) ? $this->translatable : [];
     }
 
     public function getCasts()
@@ -396,48 +357,84 @@ trait Translatable
     /**
      * Determine if a set mutator exists for an attribute.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     public function hasSetTranslationModifier($key)
     {
-        return method_exists($this, 'set'.Str::studly($key).'TranslationModifier');
-    }
-
-    /**
-     * Get the translation of an attribute using its mutator.
-     *
-     * @param  string  $key
-     * @param  mixed   $value
-     * @param  string  $locale
-     * @return mixed
-     */
-    protected function mutateSetTranslation($key, $value, $locale)
-    {
-        return $this->{'set'.Str::studly($key).'TranslationModifier'}($value, $locale);
+        return method_exists($this, 'set' . Str::studly($key) . 'TranslationModifier');
     }
 
     /**
      * Determine if a get mutator exists for an attribute.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     public function hasGetTranslationModifier($key)
     {
-        return method_exists($this, 'get'.Str::studly($key).'TranslationModifier');
+        return method_exists($this, 'get' . Str::studly($key) . 'TranslationModifier');
+    }
+
+    protected function guardAgainstUntranslatableAttribute($key)
+    {
+        if (!$this->isTranslatableAttribute($key)) {
+            throw AttributeIsNotTranslatable::make($key, $this);
+        }
+    }
+
+    protected function getLocale()
+    {
+        return config('app.locale');
+    }
+
+    protected function getFallbackTranslation($key, $locale, array $translations)
+    {
+        if (method_exists($this, $fallbackMethod = 'get' . Str::studly($key) . 'FallbackTranslation')) {
+            return $this->{$fallbackMethod}($locale, $translations);
+        }
+
+        if (!is_null($fallbackLocale = config('eloquent-translatable.fallback_locale'))) {
+            if (array_key_exists($fallbackLocale, $translations)) {
+                return $translations[$fallbackLocale];
+            }
+        }
+
+        return config('eloquent-translatable.fallback_value', null);
+    }
+
+    protected function jsonResponsesUntranslatable()
+    {
+        return [];
     }
 
     /**
      * Get the translation of an attribute using its mutator.
      *
-     * @param  string  $key
-     * @param  mixed   $value
-     * @param  string  $locale
+     * @param string $key
+     * @param mixed  $value
+     * @param string $locale
+     *
+     * @return mixed
+     */
+    protected function mutateSetTranslation($key, $value, $locale)
+    {
+        return $this->{'set' . Str::studly($key) . 'TranslationModifier'}($value, $locale);
+    }
+
+    /**
+     * Get the translation of an attribute using its mutator.
+     *
+     * @param string $key
+     * @param mixed  $value
+     * @param string $locale
+     *
      * @return mixed
      */
     protected function mutateGetTranslation($key, $value, $locale)
     {
-        return $this->{'get'.Str::studly($key).'TranslationModifier'}($value, $locale);
+        return $this->{'get' . Str::studly($key) . 'TranslationModifier'}($value, $locale);
     }
 }
