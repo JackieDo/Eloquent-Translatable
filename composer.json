@@ -22,5 +22,12 @@
             "Jackiedo\\EloquentTranslatable\\": "src/Jackiedo/EloquentTranslatable"
         }
     },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Jackiedo\\EloquentTranslatable\\EloquentTranslatableServiceProvider"
+            ]
+        }
+    },
     "minimum-stability": "stable"
 }
